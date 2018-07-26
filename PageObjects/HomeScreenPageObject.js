@@ -1,4 +1,4 @@
-const HomeScreen = function() {
+var HomeScreen = function() {
 	
 	//Bet Container Elements
 	this.lastWinResults = element(by.id('lastWin'));
@@ -14,6 +14,8 @@ const HomeScreen = function() {
 	this.wonHighlight = element(by.css('won'));
 
 	//Slot Machine Elements
+	this.firstReel = element(by.id('reel1'));
+	this.secondReel = element(by.id('reel2'));
 	this.thirdReel = element(by.id('reel3'));
 
 	//Test Elements
@@ -22,7 +24,7 @@ const HomeScreen = function() {
 	//Action Methods
 	this.spinSlotMachine = () => { this.spinButton.click(); };
 	
-	//Reel texture position of the prizes
+	//Reel texture position of the prizes for slot machine 1 and reelSet1
 	this.prize6 = '-1234px';
 	this.prize4 = '-994px';
 	this.prize2 = '-754px';
@@ -80,8 +82,11 @@ const HomeScreen = function() {
 				if(newTexturePosition == oldTexturePosition) { return; };
 				oldTexturePosition = newTexturePosition;
 			});
-
 		};
+	};
+
+	this.didPlayerWon = () => {
+
 	};
 };
 
