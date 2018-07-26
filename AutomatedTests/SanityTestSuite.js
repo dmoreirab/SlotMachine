@@ -1,16 +1,16 @@
 //Require PageObjects
 var HomeScreen = require('../PageObjects/HomeScreenPageObject');
 
-describe('Checking elements without spinning the roulette', function() {
+describe('Checking elements without spinning the roulette', () => {
 	//Instantiate PageObjects
 	var homeScreen = new HomeScreen();
 	
-	it('should increase the bet if the raise button is pressed', function() {
+	it('should increase the bet if the raise button is pressed', () => {
 		//Check the initial bet number
 		homeScreen.getBetNumber()
 
 		//Storing the initial bet number
-		.then(function(betNumberBeforeIncreasing) {
+		.then(betNumberBeforeIncreasing => {
 			
 			//Increasing the bet number clicking the button
 			homeScreen.increaseBetUsingButton(1);
@@ -19,7 +19,7 @@ describe('Checking elements without spinning the roulette', function() {
 			homeScreen.getBetNumber()
 
 			//Storing the new bet number
-			.then(function(betNumberAfterIncreasing) {
+			.then(betNumberAfterIncreasing => {
 
 				//Checking if difference between the final number and the initial number
 				expect(betNumberAfterIncreasing - betNumberBeforeIncreasing).toEqual(1);
@@ -27,7 +27,7 @@ describe('Checking elements without spinning the roulette', function() {
 		});
 	});
 	
-	it('should decrease the bet if the decrease button is pressed', function() {
+	it('should decrease the bet if the decrease button is pressed', () => {
 		//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
 		homeScreen.increaseBetUsingButton(5);
 
@@ -35,7 +35,7 @@ describe('Checking elements without spinning the roulette', function() {
 		homeScreen.getBetNumber()
 
 		//Storing the initial bet number
-		.then(function(betNumberBeforeDecreasing) {
+		.then(betNumberBeforeDecreasing => {
 			
 			//Decrease the bet number clicking the button, in this test I want to decrease it 5 times, as well
 			homeScreen.decreaseBetUsingButton(5);
@@ -44,7 +44,7 @@ describe('Checking elements without spinning the roulette', function() {
 			homeScreen.getBetNumber()
 
 			//Storing the new bet number
-			.then(function(betNumberAfterDecreasing) {
+			.then(betNumberAfterDecreasing => {
 
 				//Checking if difference between the final number and the initial number  				
 				expect(betNumberBeforeDecreasing - betNumberAfterDecreasing).toEqual(5);
@@ -80,14 +80,14 @@ describe('Checking elements without spinning the roulette', function() {
 		});
 	});
 
-	describe('Spin the Roulette', function() {
+	describe('Spin the Roulette', () => {
 
-		it('should spend credits', function() {
+		it('should spend credits', () => {
 			//Check the initial number of credits
 			homeScreen.getCurrentCredits()
 	
 			//Storing the initial credit number
-			.then(function(creditsBeforeSpinning) {
+			.then(creditsBeforeSpinning => {
 				
 				//Spinning the roulette
 				homeScreen.spinRoulette();
@@ -96,13 +96,13 @@ describe('Checking elements without spinning the roulette', function() {
 				homeScreen.getCurrentCredits()
 	
 				//Storing the final credit number
-				.then(function(creditsAfterSpinning) {
+				.then(creditsAfterSpinning => {
 					
 					//Getting the actual Bet Number
 					homeScreen.getBetNumber()
 					
 					//Storing the bet number
-					.then(function(betNumber) {
+					.then(betNumber => {
 						
 						//Checking if the difference between the initial and final number is the bet number
 						expect(creditsBeforeSpinning - creditsAfterSpinning).toEqual(parseInt(betNumber));
@@ -111,20 +111,21 @@ describe('Checking elements without spinning the roulette', function() {
 			});
 		});
 
-		describe('If the player wins', function() {
-			it('should increase the number of credits if the result sequence is a win', function() {
+		describe('If the player wins', () => {
+			
+			it('should increase the number of credits if the result sequence is a win', () => {
 			
 			});
-	
-			it('should display the last prize the player won', function() {
+
+			it('should display the last prize the player won', () => {
 			
 			});
-	
-			it('should display in the Win Chart the winning combination', function() {
+
+			it('should display in the Win Chart the winning combination', () => {
 			
 			});
-	
-			it('should highlight Play Won in the slot machine header', function() {
+
+			it('should highlight Play Won in the slot machine header', () => {
 			
 			});
 		});

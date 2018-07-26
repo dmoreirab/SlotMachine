@@ -7,7 +7,6 @@ var HomeScreen = function() {
 	this.betSpinUp = element(by.id('betSpinUp'));
 	this.betSpinDown = element(by.id('betSpinDown'));
 	this.spinButton = element(by.id('spinButton'));
-	
 
 	//Win Chart Elements
 	this.prizes = element.all(by.css('span.tdPayout'));
@@ -16,31 +15,25 @@ var HomeScreen = function() {
 	this.slotsInnerContainer = element(by.id('SlotsInnerContainer'));
 	
 	//Action Methods
-	this.spinRoulette = function() {		
-		this.spinButton.click();		
-	};
+	this.spinRoulette = () => { this.spinButton.click(); };
 	
-	this.increaseBetUsingButton = function(numberOfRaises) {
+	this.increaseBetUsingButton = numberOfRaises => {
 		for (i = 0; i < numberOfRaises; i++) {
 			this.betSpinUp.click();
 		}		
 	};
 	
-	this.decreaseBetUsingButton = function(numberOfDecreases) {
+	this.decreaseBetUsingButton = numberOfDecreases => {
 		for (i = 0; i < numberOfDecreases; i++) {
 			this.betSpinDown.click();
 		};	
 	};
 	
-	this.getlastWinResults = function() {
-		return this.lastWinResults.getText();
-	};
+	this.getlastWinResults = () => { this.lastWinResults.getText(); };
 	
-	this.getCurrentCredits = function() {
-		return this.creditsResults.getText();
-	};
+	this.getCurrentCredits = () => { this.creditsResults.getText(); };
 
-	this.calculateCreditsResults = function(valueBeforeSpinning, valueAfterSpinning) {
+	this.calculateCreditsResults = (valueBeforeSpinning, valueAfterSpinning) => {
 		if(this.lastWinResults.getText() === '') {
 			return (valueAfterSpinning - valueBeforeSpinning);
 		}
@@ -49,17 +42,11 @@ var HomeScreen = function() {
 		}
 	};
 	
-	this.getBetNumber = function() {
-		return this.betNumber.getText();
-	};
+	this.getBetNumber = () => {	this.betNumber.getText(); };
 	
-	this.getPrizeNumber = function(prizePosition) {
-		return this.prizes.get(prizePosition).getText();
-	};
+	this.getPrizeNumber = prizePosition => { this.prizes.get(prizePosition).getText(); };
 
-	this.getPrizeNumbers = function() {
-		return this.prizes;
-	};
+	this.getPrizeNumbers = () => { this.prizes; };
 };
 
 module.exports = HomeScreen;
