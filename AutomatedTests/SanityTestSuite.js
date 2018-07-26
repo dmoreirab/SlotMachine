@@ -1,11 +1,12 @@
 //Require PageObjects
 var HomeScreen = require('../PageObjects/HomeScreenPageObject');
 
-describe('Checking elements without spinning the roulette', () => {
+describe('Sanity Test Suite - the SlotMachine webapp', () => {
 	//Instantiate PageObjects
 	var homeScreen = new HomeScreen();
 	
 	it('should increase the bet if the raise button is pressed', () => {
+		const numberOfRaises = 1;
 		//Check the initial bet number
 		homeScreen.getBetNumber()
 
@@ -13,7 +14,7 @@ describe('Checking elements without spinning the roulette', () => {
 		.then(betNumberBeforeIncreasing => {
 			
 			//Increasing the bet number clicking the button
-			homeScreen.increaseBetUsingButton(1);
+			homeScreen.increaseBetUsingButton(numberOfRaises);
 
 			//Getting the new bet number
 			homeScreen.getBetNumber()
@@ -22,12 +23,13 @@ describe('Checking elements without spinning the roulette', () => {
 			.then(betNumberAfterIncreasing => {
 
 				//Checking if difference between the final number and the initial number
-				expect(betNumberAfterIncreasing - betNumberBeforeIncreasing).toEqual(1);
+				expect(betNumberAfterIncreasing - betNumberBeforeIncreasing).toEqual(numberOfRaises);
 			});
 		});
 	});
 	
 	it('should decrease the bet if the decrease button is pressed', () => {
+		const numberOfRaises = 5;
 		//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
 		homeScreen.increaseBetUsingButton(5);
 
@@ -38,7 +40,7 @@ describe('Checking elements without spinning the roulette', () => {
 		.then(betNumberBeforeDecreasing => {
 			
 			//Decrease the bet number clicking the button, in this test I want to decrease it 5 times, as well
-			homeScreen.decreaseBetUsingButton(5);
+			homeScreen.decreaseBetUsingButton(numberOfRaises);
 
 			//Getting the new bet number
 			homeScreen.getBetNumber()
@@ -47,13 +49,14 @@ describe('Checking elements without spinning the roulette', () => {
 			.then(betNumberAfterDecreasing => {
 
 				//Checking if difference between the final number and the initial number  				
-				expect(betNumberBeforeDecreasing - betNumberAfterDecreasing).toEqual(5);
+				expect(betNumberBeforeDecreasing - betNumberAfterDecreasing).toEqual(numberOfRaises);
 			});
 		});
 	});
 
 	it('should multiply the prizes in the Win Chart by the number of the players Bet', () => {
 		const defaultPrizes = [200, 50, 20, 16, 15, 14, 12, 7, 4];
+		const numberOfPrizes = 9;
 		
 		//Get the bet number
 		homeScreen.getBetNumber()
@@ -69,7 +72,7 @@ describe('Checking elements without spinning the roulette', () => {
 			//We need to treat it before comparing with defaultPrizesMultipliedByBetNumber, since homescreen.prizes got more elements than we wanted
 			displayedPrizesTextRaw.then(rawPrizes => {
 				//We need to remove the other elements, leaving only the filled elements prizes
-				const displayedPrizesSliced = rawPrizes.slice(0, 9);
+				const displayedPrizesSliced = rawPrizes.slice(0, numberOfPrizes);
 				
 				//Now that we have the number of elements we need in the array, we need to treat every string element and parse them to integers
 				const displayedPrizesParsedToInteger = displayedPrizesSliced.map(num => parseInt(num, 10));
@@ -77,10 +80,10 @@ describe('Checking elements without spinning the roulette', () => {
 				//And finally compare it to the default prizes multiplied by the bet number
 				expect(displayedPrizesParsedToInteger).toEqual(defaultPrizesMultipliedByBetNumber);
 			});					
-		});
+		});	
 	});
 
-	describe('Spin the Roulette', () => {
+	describe('Spin the slot machine', () => {
 
 		it('should spend credits', () => {
 			//Check the initial number of credits
@@ -89,8 +92,8 @@ describe('Checking elements without spinning the roulette', () => {
 			//Storing the initial credit number
 			.then(creditsBeforeSpinning => {
 				
-				//Spinning the roulette
-				homeScreen.spinRoulette();
+				//Spinning the slot machine
+				homeScreen.spinSlotMachine();
 	
 				//Getting the new credit number
 				homeScreen.getCurrentCredits()
@@ -106,15 +109,37 @@ describe('Checking elements without spinning the roulette', () => {
 						
 						//Checking if the difference between the initial and final number is the bet number
 						expect(creditsBeforeSpinning - creditsAfterSpinning).toEqual(parseInt(betNumber));
+
+						//Make sure the slot machine stopped spinning to create independency between tests
+						homeScreen.confirmSlotMachineStoppedSpinning();
 					});		
 				});			
 			});
 		});
 
+		it('should disable the spinButton after spinning the slot machine', () => {
+			homeScreen.spinSlotMachine();
+
+			expect(homeScreen.spinButtonDisabled.isDisplayed()).toBe(true);
+			
+			homeScreen.confirmSlotMachineStoppedSpinning();
+		});
+
+		it('should re-enable the spinButton after the slot machine stopped spinning', () => {				
+			homeScreen.spinSlotMachine();
+
+			expect(homeScreen.spinButtonDisabled.isDisplayed()).toBe(true);
+
+			homeScreen.confirmSlotMachineStoppedSpinning();
+
+			expect(homeScreen.spinButton.isDisplayed()).toBe(true);
+			
+		});
+
 		describe('If the player wins', () => {
-			
-			it('should increase the number of credits if the result sequence is a win', () => {
-			
+
+			it('should increase the number of credits if the result sequence is a win', () => {				
+				
 			});
 
 			it('should display the last prize the player won', () => {
@@ -126,6 +151,12 @@ describe('Checking elements without spinning the roulette', () => {
 			});
 
 			it('should highlight Play Won in the slot machine header', () => {
+			
+			});
+		});
+
+		describe('If the player loses', () => {
+			it('should disable the spin button if the players bet is greater than this credits', () => {
 			
 			});
 		});

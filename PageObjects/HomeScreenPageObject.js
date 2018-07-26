@@ -1,4 +1,4 @@
-var HomeScreen = function() {
+const HomeScreen = function() {
 	
 	//Bet Container Elements
 	this.lastWinResults = element(by.id('lastWin'));
@@ -7,16 +7,29 @@ var HomeScreen = function() {
 	this.betSpinUp = element(by.id('betSpinUp'));
 	this.betSpinDown = element(by.id('betSpinDown'));
 	this.spinButton = element(by.id('spinButton'));
+	this.spinButtonDisabled = element(by.css('.disabled'));
 
 	//Win Chart Elements
 	this.prizes = element.all(by.css('span.tdPayout'));
+	this.wonHighlight = element(by.css('won'));
+
+	//Slot Machine Elements
+	this.thirdReel = element(by.id('reel3'));
 
 	//Test Elements
 	this.slotsInnerContainer = element(by.id('SlotsInnerContainer'));
 	
 	//Action Methods
-	this.spinRoulette = () => { this.spinButton.click(); };
+	this.spinSlotMachine = () => { this.spinButton.click(); };
 	
+	//Reel texture position of the prizes
+	this.prize6 = '-1234px';
+	this.prize4 = '-994px';
+	this.prize2 = '-754px';
+	this.prize1 = '-634px';
+	this.prize5 = '-1114px';
+	this.prize3 = '-874px';
+
 	this.increaseBetUsingButton = numberOfRaises => {
 		for (i = 0; i < numberOfRaises; i++) {
 			this.betSpinUp.click();
@@ -29,9 +42,13 @@ var HomeScreen = function() {
 		};	
 	};
 	
-	this.getlastWinResults = () => { this.lastWinResults.getText(); };
+	this.getlastWinResults = () => { 
+		return this.lastWinResults.getText(); 
+	};
 	
-	this.getCurrentCredits = () => { this.creditsResults.getText(); };
+	this.getCurrentCredits = () => { 
+		return this.creditsResults.getText(); 
+	};
 
 	this.calculateCreditsResults = (valueBeforeSpinning, valueAfterSpinning) => {
 		if(this.lastWinResults.getText() === '') {
@@ -42,11 +59,30 @@ var HomeScreen = function() {
 		}
 	};
 	
-	this.getBetNumber = () => {	this.betNumber.getText(); };
+	this.getBetNumber = () => {	
+		return this.betNumber.getText(); 
+	};
 	
 	this.getPrizeNumber = prizePosition => { this.prizes.get(prizePosition).getText(); };
 
 	this.getPrizeNumbers = () => { this.prizes; };
+
+	this.getThirdReelTexturePosition = () => {
+		return this.thirdReel.getCssValue('top');
+	}
+
+	this.confirmSlotMachineStoppedSpinning = () => {
+		const numberOfSpins = 100;
+		var oldTexturePosition = '';
+
+		for(i = 0; i < numberOfSpins; i++) {
+			this.getThirdReelTexturePosition().then(newTexturePosition => {				
+				if(newTexturePosition == oldTexturePosition) { return; };
+				oldTexturePosition = newTexturePosition;
+			});
+
+		};
+	};
 };
 
 module.exports = HomeScreen;
