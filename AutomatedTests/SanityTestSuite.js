@@ -156,7 +156,39 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 				tryToWin();				
 			});
 
-			fit('should increase the number of credits', () => {	
+			it('should highlight Play Won in the slot machine header', () => {
+				//We need to wait until the player wins, so we will loop this method until we get a victory			
+				const tryToWin = () => {
+
+					//This method will spin the slotmachine, wait until the reel stops and check victory conditions
+					//If positive, he will continue from here, if not, the function tryToWin will run again
+					homeScreen.playOnceCheckForVictory()
+					.then(() => {
+
+						//Checking if the Won Highlight is displayed
+						expect(homeScreen.isWonHighlighted()).toBe(true);							
+					}, tryToWin);				
+				};			
+				tryToWin();
+			});
+
+			it('should display in the Win Chart the winning combination highlighted', () => {
+				//We need to wait until the player wins, so we will loop this method until we get a victory			
+				const tryToWin = () => {
+
+					//This method will spin the slotmachine, wait until the reel stops and check victory conditions
+					//If positive, he will continue from here, if not, the function tryToWin will run again
+					homeScreen.playOnceCheckForVictory()
+					.then(() => {
+
+						//Checking if the Won Highlight is displayed
+						expect(homeScreen.isWonHighlighted()).toBe(true);							
+					}, tryToWin);				
+				};			
+				tryToWin();
+			});		
+
+			it('should increase the number of credits', () => {	
 				//We need to wait until the player wins, so we will loop this method until we get a victory			
 				const tryToWin = () => {
 
@@ -207,13 +239,7 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 				
 			});
 
-			it('should display in the Win Chart the winning combination', () => {
-			
-			});
-
-			it('should highlight Play Won in the slot machine header', () => {
-			
-			});
+				
 		});
 
 		describe('If the player loses', () => {

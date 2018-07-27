@@ -11,7 +11,7 @@ var HomeScreen = function () {
 
 	//Win Chart Elements
 	this.prizes = element.all(by.css('span.tdPayout'));
-	this.wonHighlight = element(by.css('won'));
+	this.wonHighlight = element.all(by.css('.won'));
 
 	//Slot Machine Elements
 	this.firstReel = element(by.id('reel1'));
@@ -81,6 +81,8 @@ var HomeScreen = function () {
 		return this.thirdReel.getCssValue('top');
 	};
 
+	this.isWonHighlighted = () => { return this.wonHighlight.get(0).isDisplayed(); };
+
 	//In this function, we are waiting for the last position of the third reel to stop changing
 	this.confirmSlotMachineStoppedSpinning = () => {
 		const numberOfSpins = 100;
@@ -101,7 +103,7 @@ var HomeScreen = function () {
 		.then(lastWinResults => {
 			const promiseCreditsAdded = new protractor.promise.defer();
 			const didLastWinGotUpdated = lastWinResults != undefined ? true :  false;
-			
+
 			if(didLastWinGotUpdated) {
 				promiseCreditsAdded.fulfill(didLastWinGotUpdated);
 			}
