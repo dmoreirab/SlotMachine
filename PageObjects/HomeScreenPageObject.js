@@ -81,19 +81,45 @@ var HomeScreen = function () {
 		return this.thirdReel.getCssValue('top');
 	};
 
+	//In this function, we are waiting for the last position of the third reel to stop changing
 	this.confirmSlotMachineStoppedSpinning = () => {
 		const numberOfSpins = 100;
 		var oldTexturePosition = '';
 
+		//When the new position is equal to the old one, we are considering the reel stopped and we break the loop
 		for (i = 0; i < numberOfSpins; i++) {
 			this.getLastReelTexturePosition().then(newTexturePosition => {
-				if (newTexturePosition == oldTexturePosition) { return; };
+				if (newTexturePosition === oldTexturePosition) { return; };
 				oldTexturePosition = newTexturePosition;
 			});
 		};
 	};
 
+	//In this function, we are waiting for the credits value stop incrementing after the player has won
+	this.confirmCreditsWereAdded = () => {
+		return this.getlastWinResults()
+		.then(lastWinResults => {
+			const promiseCreditsAdded = new protractor.promise.defer();
+			const didLastWinGotUpdated = lastWinResults != undefined ? true :  false;
+			
+			if(didLastWinGotUpdated) {
+				promiseCreditsAdded.fulfill(didLastWinGotUpdated);
+			}
+			else {
+				promiseCreditsAdded.reject(didLastWinGotUpdated);
+			}
+			return promiseCreditsAdded;
+		});				
+	};
+
+	this.playOnceCheckForVictory = () => {
+		this.spinSlotMachine();	
+		this.confirmSlotMachineStoppedSpinning();	
+		return this.didThePlayerWinInSlotMachine1ReelSet1();
+	};
+
 	this.didThePlayerWinInSlotMachine1ReelSet1 = () => {
+		//Getting all the 3 texture position of the 3 reels
 		return protractor.promise.all([
 			this.getFirstReelTexturePosition(), 
 			this.getMiddleReelTexturePosition(), 
@@ -101,27 +127,33 @@ var HomeScreen = function () {
 		])
 		.then(values => {
 			const [first, middle, last] = values;
-			console.log(values);
+
+			//We want to check if the player wins, so, we need to create a promise that will return a boolean
 			const wonPromise = new protractor.promise.defer();
-				const checkForCombinationsWithTheSameSymbol = prize => 
+
+				//SlotMachine1 ReelSet1 win logic								
+				const oneSymbol = prize => 
 					first === prize && middle === prize && last === prize;
 				
-				const checkForCombinationsWithTwoDifferentSymbols = () => {
+				const twoSymbols = () => {
 					return (first === this.prize3 || first === this.prize1)
 						&& (middle === this.prize5 || first === this.prize2)
 						&& (last === this.prize4 || first === this.prize6)					
 				}
 
-				const checkPrize3 = () => {
+				const threeSymbols = () => {
 					return (first === this.prize5 || first === this.prize3 || first === this.prize1)
 					&& (middle === this.prize5 || middle === this.prize3 || middle === this.prize1)
 					&&	(last === this.prize5 || last === this.prize3 || last === this.prize1)						
 				}
 
-				const hasWon = checkPrize(this.prize6) || checkPrize(this.prize4) || checkPrize(this.prize2) ||
-					checkPrize(this.prize5) || checkPrize(this.prize1) || checkPrize(this.prize3) ||
-					checkPrize2() || checkPrize3();
+				//The result: did the player win? it will return the boolean we wanted
+				const hasWon = oneSymbol(this.prize6) || oneSymbol(this.prize4) || oneSymbol(this.prize2) ||
+				oneSymbol(this.prize5) || oneSymbol(this.prize1) || oneSymbol(this.prize3) ||
+				twoSymbols() || threeSymbols();
 				
+				//Finally we fulfill or reject our promise based on the boolean we got from above and pass it
+				//to the return of our promise. 
 				if(!hasWon) {
 					wonPromise.reject(hasWon);		
 				}
@@ -131,6 +163,8 @@ var HomeScreen = function () {
 			return wonPromise.promise;
 		});
 	};
+
+	
 };
 
 module.exports = HomeScreen;
