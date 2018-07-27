@@ -4,7 +4,7 @@ exports.config = {
 	
 	//Suites to be executed
 	suites: {
-	setup: './AutomatedTests/testSuiteSetup.js',
+	//setup: './AutomatedTests/testSuiteSetup.js',
 	specs: './AutomatedTests/SanityTestSuite.js'
 	},
 

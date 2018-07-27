@@ -1,6 +1,11 @@
 //Require PageObjects
 var HomeScreen = require('../PageObjects/HomeScreenPageObject');
 
+beforeAll(() => {
+	browser.waitForAngularEnabled(false);
+	browser.get('http://slotmachinescript.com/');
+});
+
 describe('Sanity Test Suite - the SlotMachine webapp', () => {
 	//Instantiate PageObjects
 	var homeScreen = new HomeScreen();
@@ -132,6 +137,7 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 
 			homeScreen.confirmSlotMachineStoppedSpinning();
 
+			//need to fix this expect since it is passing every time.
 			expect(homeScreen.spinButton.isDisplayed()).toBe(true);
 			
 		});
@@ -140,6 +146,22 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 
 			it('should increase the number of credits if the result sequence is a win', () => {				
 				
+							
+			});
+
+			fit('lalala', () => {	
+				console.log('lalala');			
+				let hasWon = false;
+				const tryToWin = () => {
+					console.log('lalala2');
+					homeScreen.spinSlotMachine();	
+					homeScreen.confirmSlotMachineStoppedSpinning();	
+					homeScreen.didThePlayerWinInSlotMachine1ReelSet1()
+					.then(didThePlayerWon => {
+						expect(didThePlayerWon).toBe(true);
+					}, tryToWin);
+				};
+				tryToWin();				
 			});
 
 			it('should display the last prize the player won', () => {
