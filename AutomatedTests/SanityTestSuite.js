@@ -1,6 +1,9 @@
 //Require PageObjects
 var HomeScreen = require('../PageObjects/HomeScreenPageObject');
 
+//Getting Protractor Expected Conditions library
+var EC = protractor.ExpectedConditions;
+
 beforeAll(() => {
 	browser.waitForAngularEnabled(false);
 	browser.get('http://slotmachinescript.com/');
@@ -36,7 +39,7 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 	it('should decrease the bet if the decrease button is pressed', () => {
 		const numberOfRaises = 5;
 		//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
-		homeScreen.increaseBetUsingButton(5);
+		homeScreen.increaseBetUsingButton(numberOfRaises);
 
 		//Check the initial bet number
 		homeScreen.getBetNumber()
@@ -122,6 +125,13 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 			});
 		});
 
+		// it('TESTING', () => {
+		// 	homeScreen.getArrayOfPrizesUpdated()
+		// 	.then(arrayOfPrizes => {
+		// 		console.log(arrayOfPrizes);				
+		// 	});
+		// });
+
 		it('should disable the spinButton after spinning the slot machine', () => {
 			homeScreen.spinSlotMachine();
 
@@ -188,14 +198,18 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 				tryToWin();
 			});		
 
-			it('should increase the number of credits', () => {	
-				//We need to wait until the player wins, so we will loop this method until we get a victory			
+			fit('should increase the number of credits', () => {	
+				const numberOfRaises = 5;
+				//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
+				homeScreen.increaseBetUsingButton(numberOfRaises);
+				
+				//We need to wait until the player wins, so we will loop this method until we get a victory							
 				const tryToWin = () => {
 
 					//We need to get and store the current credits before playing so we can compare it in the end
 					homeScreen.getCurrentCredits()
 					.then(creditsBeforeAddingPrize => {
-						
+						console.log('creditsBeforeAddingPrize: ' + creditsBeforeAddingPrize);
 						//This method will spin the slotmachine, wait until the reel stops and check victory conditions
 						//If positive, he will continue from here, if not, the function tryToWin will run again
 						homeScreen.playOnceCheckForVictory()
@@ -204,28 +218,34 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 							//We need to get the betNumber to use later in the comparison as well
 							homeScreen.getBetNumber()
 							.then(betNumber => {
-								
-								//We need to make sure our test don't continue until the credits are added.
-								//So i created a new promise that will tell me when it finished counting.
-								//If didn't stop we will run this waitCreditsToBeAdded until it does
-								const waitCreditsToBeAdded = () => {
-									homeScreen.confirmCreditsWereAdded()
-									.then(() => {
+								homeScreen.returnPrizeInCredits()
+								.then(prizeValue => {
+									
+									const lastWinElement = homeScreen.lastWinResults;
+									console.log(lastWinElement.getText().then);
 
-										//Now, we get the final credits and store it for later comparison
-										homeScreen.getCurrentCredits()
+									const timeNeededToAddCreditsInMiliseconds = 30000;
+									const lastWinResultsToHaveValue = 
+										EC.textToBePresentInElement(lastWinElement, prizeValue);
 
-										//Finally we get and store the last Win results, that will be added
-										//to credits minus the betNumber
-										.then(finalCreditsAfterPlaying => {
-											homeScreen.getlastWinResults()
-											.then(lastWinResults => {
-												expect(parseInt(finalCreditsAfterPlaying)).toBe(parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - betNumber);
-											});											
-										})
-									}, waitCreditsToBeAdded);
-								};
-								waitCreditsToBeAdded();								
+									browser.wait(lastWinResultsToHaveValue, timeNeededToAddCreditsInMiliseconds);
+	
+									//Now, we get the final credits and store it for later comparison
+									homeScreen.getCurrentCredits()
+	
+									//Finally we get and store the last Win results, that will be added
+									//to credits minus the betNumber
+									.then(finalCreditsAfterPlaying => {
+										console.log('betNUmber3: ' + betNumber);
+										homeScreen.getlastWinResults()
+										.then(lastWinResults => {
+											console.log('betNUmber4: ' + betNumber);
+											console.log('lastWinResults: ' + lastWinResults);
+											console.log('finalCreditsAfterPlaying: ' + finalCreditsAfterPlaying);
+											expect(parseInt(finalCreditsAfterPlaying)).toBe(parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - parseInt(betNumber));
+										});											
+									});					
+								});																											
 							});
 						}, tryToWin);
 					}); 
