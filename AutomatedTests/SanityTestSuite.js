@@ -9,7 +9,7 @@ beforeAll(() => {
 	browser.get('http://slotmachinescript.com/');
 });
 
-describe('Sanity Test Suite - the SlotMachine webapp', () => {
+describe('Sanity Test Suite - SlotMachine', () => {
 	//Instantiate PageObjects
 	var homeScreen = new HomeScreen();
 	
@@ -93,6 +93,14 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 
 	describe('Spin the slot machine', () => {
 
+		it('Should check if TRY ME arrow moved out of the SPIN button after spinning', () => {
+
+		})
+
+		it('Should check if TRY ME arrow disappeared after changing background', () => {
+
+		})
+
 		it('should spend credits', () => {
 			//Check the initial number of credits
 			homeScreen.getCurrentCredits()
@@ -125,13 +133,6 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 			});
 		});
 
-		// it('TESTING', () => {
-		// 	homeScreen.getArrayOfPrizesUpdated()
-		// 	.then(arrayOfPrizes => {
-		// 		console.log(arrayOfPrizes);				
-		// 	});
-		// });
-
 		it('should disable the spinButton after spinning the slot machine', () => {
 			homeScreen.spinSlotMachine();
 
@@ -140,15 +141,15 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 			homeScreen.confirmSlotMachineStoppedSpinning();
 		});
 
-		it('should re-enable the spinButton after the slot machine stopped spinning', () => {				
+		fit('should re-enable the spinButton after the slot machine stopped spinning', () => {				
 			homeScreen.spinSlotMachine();
 
-			expect(homeScreen.spinButtonDisabled.isDisplayed()).toBe(true);
+			expect(homeScreen.spinButtonDisabled.isPresent()).toBeTruthy();
 
 			homeScreen.confirmSlotMachineStoppedSpinning();
 
 			//need to fix this expect since it is passing every time.
-			expect(homeScreen.spinButton.isDisplayed()).toBe(true);
+			expect(homeScreen.spinButtonDisabled.isPresent()).toBeFalsy();
 			
 		});
 
@@ -198,14 +199,48 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 				tryToWin();
 			});		
 
-			fit('should increase the number of credits', () => {	
-				const numberOfRaises = 5;
+			it('should check if the prize in the Win Chart is displayed in the Last Win field', () => {
+				const numberOfRaises = 3;
 				//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
 				homeScreen.increaseBetUsingButton(numberOfRaises);
 				
 				//We need to wait until the player wins, so we will loop this method until we get a victory							
 				const tryToWin = () => {
 
+					//We need to get and store the current credits before playing so we can compare it in the end
+					homeScreen.getCurrentCredits()
+					.then(creditsBeforeAddingPrize => {
+						
+						homeScreen.playOnceCheckForVictory()
+						.then(() => {
+							homeScreen.returnPrizeInCredits()
+							.then(prizeValue => {
+								const timeNeededToAddCreditsInMiliseconds = 30000;
+								const lastWinResultsToHaveValue = 
+									EC.textToBePresentInElement(homeScreen.lastWinResults, prizeValue);
+								browser.wait(lastWinResultsToHaveValue, timeNeededToAddCreditsInMiliseconds);
+								
+								homeScreen.getlastWinResults()
+								.then(lastWinResults => {									
+									expect(parseInt(lastWinResults)).toBe(prizeValue);
+								});											
+							});																											
+						}, tryToWin);
+					}); 
+				};
+				
+				tryToWin();
+			});		
+
+
+			it('should check if the number of credits increased', () => {	
+				const numberOfRaises = 3;
+				//Increasing the bet number to assure independency between tests, in this test I want to increase 5 times
+				homeScreen.increaseBetUsingButton(numberOfRaises);
+				
+				//We need to wait until the player wins, so we will loop this method until we get a victory							
+				const tryToWin = () => {
+					console.log('1');
 					//We need to get and store the current credits before playing so we can compare it in the end
 					homeScreen.getCurrentCredits()
 					.then(creditsBeforeAddingPrize => {
@@ -222,8 +257,6 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 								.then(prizeValue => {
 									
 									const lastWinElement = homeScreen.lastWinResults;
-									console.log(lastWinElement.getText().then);
-
 									const timeNeededToAddCreditsInMiliseconds = 30000;
 									const lastWinResultsToHaveValue = 
 										EC.textToBePresentInElement(lastWinElement, prizeValue);
@@ -236,13 +269,12 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 									//Finally we get and store the last Win results, that will be added
 									//to credits minus the betNumber
 									.then(finalCreditsAfterPlaying => {
-										console.log('betNUmber3: ' + betNumber);
 										homeScreen.getlastWinResults()
 										.then(lastWinResults => {
-											console.log('betNUmber4: ' + betNumber);
 											console.log('lastWinResults: ' + lastWinResults);
 											console.log('finalCreditsAfterPlaying: ' + finalCreditsAfterPlaying);
-											expect(parseInt(finalCreditsAfterPlaying)).toBe(parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - parseInt(betNumber));
+											const conta = parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - parseInt(betNumber);
+											expect(parseInt(finalCreditsAfterPlaying)).toBe(conta);
 										});											
 									});					
 								});																											
@@ -253,19 +285,7 @@ describe('Sanity Test Suite - the SlotMachine webapp', () => {
 				
 				tryToWin();
 				
-			});
-	
-			it('should display the last prize the player won', () => {
-				
-			});
-
-				
-		});
-
-		describe('If the player loses', () => {
-			it('should disable the spin button if the players bet is greater than this credits', () => {
-			
-			});
-		});
+			});		
+		});	
 	});
 });

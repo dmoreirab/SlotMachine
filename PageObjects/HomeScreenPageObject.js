@@ -7,11 +7,11 @@ var HomeScreen = function () {
 	this.betSpinUp = element(by.id('betSpinUp'));
 	this.betSpinDown = element(by.id('betSpinDown'));
 	this.spinButton = element(by.id('spinButton'));
-	this.spinButtonDisabled = element(by.css('.disabled'));
+	this.spinButtonDisabled = $('#spinButton.disabled');
 
 	//Win Chart Elements
-	this.prizes = element.all(by.css('span.tdPayout'));
-	this.wonHighlight = element.all(by.css('.won'));
+	this.prizes = $$('span.tdPayout');
+	this.wonHighlight = $$('.won');
 
 	//Slot Machine Elements
 	this.firstReel = element(by.id('reel1'));
@@ -49,6 +49,10 @@ var HomeScreen = function () {
 	};
 
 	this.getCurrentCredits = () => {
+		return this.creditsResults.getText();
+	};
+
+	this.getCurrentCredits2 = () => {
 		return this.creditsResults.getText();
 	};
 
@@ -97,51 +101,7 @@ var HomeScreen = function () {
 			});
 		};
 	};
-	
-	//In this function, we are waiting for the credits value stop incrementing after the player has won
-	this.confirmCreditsWereAdded2 = () => {
-		return this.getlastWinResults()
-		.then(lastWinResults => {
-			console.log(lastWinResults);
-			const promiseCreditsAdded = new protractor.promise.defer();
 
-			const maxTries = 500;
-
-			for(i = 0; i < maxTries; i++) {
-				console.log('i: ' + i);
-				var didLastWinGotUpdated = lastWinResults != undefined ? true :  false;
-				console.log('didLastWinGotUpdated: ' + didLastWinGotUpdated);					
-			}
-
-			if(didLastWinGotUpdated) {
-				promiseCreditsAdded.fulfill(didLastWinGotUpdated);				
-			}
-			else {
-				promiseCreditsAdded.reject('nothing');
-			}			
-
-			return promiseCreditsAdded;
-		});				
-	};
-
-	this.confirmCreditsWereAdded = () => {
-		maxTries = 500;
-		var didLastWinGotUpdated = false;
-		for(i = 0; i < maxTries; i++) {
-			this.getlastWinResults().then(lastWinResult => {
-				didLastWinGotUpdated = lastWinResult != undefined ? true : false;
-				
-				if(didLastWinGotUpdated) { return; };	
-			});										
-		};
-	};
-
-	this.playOnceCheckForVictory = () => {
-		this.spinSlotMachine();	
-		this.confirmSlotMachineStoppedSpinning();	
-		return this.didThePlayerWinInSlotMachineReelSet(1, 1);
-	};
-		
 	this.prizeLogicForSM1RS1 = (first, middle, last) => {
 		//SlotMachine1 ReelSet1 win logic								
 		const oneSymbol = prize => 
@@ -165,6 +125,13 @@ var HomeScreen = function () {
 		twoSymbols() || threeSymbols();
 	};
 
+	
+	this.playOnceCheckForVictory = () => {
+		this.spinSlotMachine();	
+		this.confirmSlotMachineStoppedSpinning();	
+		return this.didThePlayerWinInSlotMachineReelSet(1, 1);
+	};
+			
 	this.didThePlayerWinInSlotMachineReelSet = (machineNumber, reelSetNumber) => {
 		//Getting all the 3 texture position of the 3 reels
 		return protractor.promise.all([
@@ -194,6 +161,7 @@ var HomeScreen = function () {
 		});
 	};
 
+	//This will get the current array of prizes of in the Win Chart 
 	this.getArrayOfPrizesUpdated = () => {
 		const numberOfPrizes = 9;
 		
@@ -216,6 +184,9 @@ var HomeScreen = function () {
 		});									
 	};
 
+	//This function will get all reel positions after winning. Then, the test will check which 
+	//Combination won based on the reel positions. Knowing the winning prize it will look for it 
+	//in the displayed Win Chart for a match and return the value of the prize. 
 	this.returnPrizeInCredits = () => {
 		//Getting all the 3 texture position of the 3 reels
 		return protractor.promise.all([
@@ -245,6 +216,9 @@ var HomeScreen = function () {
 				&&	(last === this.prize5 || last === this.prize3 || last === this.prize1)						
 				}
 
+				//We need to confirm that a prize won to return the value of the prize
+				//Inspecting the Win chart elements, I discovered the name of the icons
+				//For example, prize6 is match of 3 BIG WIN icons for slot machine 1 reel set 1
 				const firstPrizeWon = oneSymbol(this.prize6);
 				const secondPrizeWon = oneSymbol(this.prize4);
 				const thirdPrizeWon = oneSymbol(this.prize2);
@@ -256,11 +230,12 @@ var HomeScreen = function () {
 				
 				const hasWon = firstPrizeWon || secondPrizeWon || thirdPrizeWon || forthPrizeWon || fifthPrizeWon
 				|| sixthPrizeWon || seventhPrizeWon || eighthPrizeWon;
-				console.log('hasWon: ' + hasWon);
-				console.log(prizesArray);
 
 				var valueToBeReturned;
-
+				
+				//For example, if the eighth row of the Win Chart is the winning combination,
+				//I can assign the prize to be returned based on the array value  
+				//I got from the prizes array before
 				if(firstPrizeWon) { valueToBeReturned =  prizesArray[0]; };
 				if(secondPrizeWon) { valueToBeReturned = prizesArray[1]; };
 				if(thirdPrizeWon) { valueToBeReturned = prizesArray[2]; };
@@ -269,8 +244,7 @@ var HomeScreen = function () {
 				if(sixthPrizeWon) { valueToBeReturned = prizesArray[5]; };
 				if(seventhPrizeWon) { valueToBeReturned = prizesArray[6]; };
 				if(eighthPrizeWon) { valueToBeReturned = prizesArray[7]; };
-
-				console.log('valueToBeReturned: ' + valueToBeReturned);
+				console.log(valueToBeReturned);
 				if(!hasWon) {
 					wonPromise.reject(valueToBeReturned);		
 				}
