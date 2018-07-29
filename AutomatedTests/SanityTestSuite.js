@@ -9,6 +9,11 @@ beforeAll(() => {
 	browser.get('http://slotmachinescript.com/');
 });
 
+//To make sure all test can run independently, I want to the system to be fresh every test.
+beforeEach(() => {
+	browser.refresh();
+});
+
 describe('Sanity Test Suite - SlotMachine', () => {
 	//Instantiate PageObjects
 	var homeScreen = new HomeScreen();
@@ -94,12 +99,17 @@ describe('Sanity Test Suite - SlotMachine', () => {
 	describe('Spin the slot machine', () => {
 
 		it('Should check if TRY ME arrow moved out of the SPIN button after spinning', () => {
-
-		})
+			expect(homeScreen.tryMeSpinButton.isPresent()).toBeTruthy();
+			homeScreen.spinSlotMachine();
+			expect(homeScreen.tryMeSpinButton.isPresent()).toBeFalsy();
+		});
 
 		it('Should check if TRY ME arrow disappeared after changing background', () => {
-
-		})
+			homeScreen.spinSlotMachine();
+			expect(homeScreen.tryMeChangeBg.isPresent()).toBeTruthy();
+			homeScreen.pressChangeBgButton();
+			expect(homeScreen.tryMeChangeBg.isDisplayed()).toBeFalsy();
+		});
 
 		it('should spend credits', () => {
 			//Check the initial number of credits
@@ -141,16 +151,17 @@ describe('Sanity Test Suite - SlotMachine', () => {
 			homeScreen.confirmSlotMachineStoppedSpinning();
 		});
 
-		fit('should re-enable the spinButton after the slot machine stopped spinning', () => {				
+		it('should re-enable the spinButton after the slot machine stopped spinning', () => {				
 			homeScreen.spinSlotMachine();
 
 			expect(homeScreen.spinButtonDisabled.isPresent()).toBeTruthy();
-
-			homeScreen.confirmSlotMachineStoppedSpinning();
-
-			//need to fix this expect since it is passing every time.
-			expect(homeScreen.spinButtonDisabled.isPresent()).toBeFalsy();
-			
+			const waitUntilMachineStopped = () => {
+				homeScreen.confirmSlotMachineStoppedSpinning()
+				.then(() => {
+					//need to fix this expect since it is passing every time.
+					expect(homeScreen.spinButtonDisabled.isPresent()).toBeFalsy();
+				}, waitUntilMachineStopped);
+			}			
 		});
 
 		describe('If the player wins', () => {
@@ -209,7 +220,7 @@ describe('Sanity Test Suite - SlotMachine', () => {
 
 					//We need to get and store the current credits before playing so we can compare it in the end
 					homeScreen.getCurrentCredits()
-					.then(creditsBeforeAddingPrize => {
+					.then(() => {
 						
 						homeScreen.playOnceCheckForVictory()
 						.then(() => {
@@ -273,8 +284,8 @@ describe('Sanity Test Suite - SlotMachine', () => {
 										.then(lastWinResults => {
 											console.log('lastWinResults: ' + lastWinResults);
 											console.log('finalCreditsAfterPlaying: ' + finalCreditsAfterPlaying);
-											const conta = parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - parseInt(betNumber);
-											expect(parseInt(finalCreditsAfterPlaying)).toBe(conta);
+											const finalCredits = parseInt(creditsBeforeAddingPrize) + parseInt(lastWinResults) - parseInt(betNumber);
+											expect(parseInt(finalCreditsAfterPlaying)).toBe(finalCredits);
 										});											
 									});					
 								});																											

@@ -18,11 +18,18 @@ var HomeScreen = function () {
 	this.secondReel = element(by.id('reel2'));
 	this.thirdReel = element(by.id('reel3'));
 
-	//Test Elements
-	this.slotsInnerContainer = element(by.id('SlotsInnerContainer'));
+	//General Elements
+	this.slotsInnerContainer = $('#SlotsInnerContainer');
+	this.tryMeSpinButton = this.slotsInnerContainer.$('#tryMe');
+	
+	//Black Bar elements
+	this.blackBarContainer = $('.black_bar');
+	this.tryMeChangeBg = this.blackBarContainer.$('#tryMe');
+	this.changeBgButton = $('.btnChangeBackground');
 
 	//Action Methods
 	this.spinSlotMachine = () => { this.spinButton.click(); };
+	this.pressChangeBgButton = () => { this.changeBgButton.click(); };
 
 	//Reel texture position of the prizes for slotMachine1 and reelSet1
 	this.prize6 = '-1234px';
@@ -89,6 +96,7 @@ var HomeScreen = function () {
  	this.isPrizeHighlighted = () => { return this.wonHighlight.get(1).isDisplayed(); };
 
 	//In this function, we are waiting for the last position of the third reel to stop changing
+	//In this function, we are waiting for the last position of the third reel to stop changing
 	this.confirmSlotMachineStoppedSpinning = () => {
 		const numberOfSpins = 100;
 		var oldTexturePosition = '';
@@ -96,8 +104,11 @@ var HomeScreen = function () {
 		//When the new position is equal to the old one, we are considering the reel stopped and we break the loop
 		for (i = 0; i < numberOfSpins; i++) {
 			this.getLastReelTexturePosition().then(newTexturePosition => {
-				if (newTexturePosition === oldTexturePosition) { return; };
+				if (newTexturePosition === oldTexturePosition) { 
+					return; 
+				};
 				oldTexturePosition = newTexturePosition;
+				browser.sleep(500);
 			});
 		};
 	};
