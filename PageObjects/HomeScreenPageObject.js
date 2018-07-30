@@ -256,7 +256,6 @@ var HomeScreen = function () {
 				if(seventhPrizeWon) { valueToBeReturned = prizesArray[6]; };
 				if(eighthPrizeWon) { valueToBeReturned = prizesArray[7]; };
 
-				console.log(valueToBeReturned);
 				if(!hasWon) {
 					wonPromise.reject(valueToBeReturned);		
 				}

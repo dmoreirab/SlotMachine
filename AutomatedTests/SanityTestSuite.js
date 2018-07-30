@@ -157,21 +157,16 @@ describe('Sanity Test Suite', () => {
 			homeScreen.spinSlotMachine();
 
 			expect(homeScreen.spinButtonDisabled.isDisplayed()).toBe(true);
-			
-			homeScreen.confirmSlotMachineStoppedSpinning();
 		});
 
 		it('should re-enable the spinButton after the slot machine stopped spinning', () => {				
 			homeScreen.spinSlotMachine();
 
-			expect(homeScreen.spinButtonDisabled.isPresent()).toBeTruthy();
-			const waitUntilMachineStopped = () => {
-				homeScreen.confirmSlotMachineStoppedSpinning()
-				.then(() => {
-					//need to fix this expect since it is passing every time.
-					expect(homeScreen.spinButtonDisabled.isPresent()).toBeFalsy();
-				}, waitUntilMachineStopped);
-			}			
+			expect(homeScreen.spinButtonDisabled.isDisplayed()).toBeTruthy();
+			
+			homeScreen.confirmSlotMachineStoppedSpinning()
+			
+			expect(homeScreen.spinButtonDisabled.isPresent()).toBeFalsy();		
 		});
 
 		describe('If the player wins', () => {
