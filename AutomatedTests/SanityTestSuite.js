@@ -209,7 +209,7 @@ describe('Sanity Test Suite', () => {
 					.then(() => {
 
 						//Checking if the Won Highlight is displayed
-						expect(homeScreen.isWonHighlighted()).toBe(true);							
+						expect(homeScreen.isPrizeHighlighted()).toBe(true);							
 					}, tryToWin);				
 				};			
 				tryToWin();
